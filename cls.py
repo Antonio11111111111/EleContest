@@ -36,7 +36,7 @@ f_led = fill_light()
 labels = ["r","l","o","f","b"] #类名称，按照label.txt顺序填写
 
 img256256 = image.Image(size=(256,256))
-
+bt = 'n'
 while(True):
     gc.collect()
 
@@ -68,17 +68,19 @@ while(True):
     sbuf = [labels[_max_idx]]
     serial.send_bytearray(sbuf)
     bt = serial.rec_bytes()
-    # 握手成功后显示
+    # uart的各种状态显示
     if bt == 's': # succeed for uart of K210
         f_led.fill_onoff(0) #补光灯关
         time.sleep(0.5)  #延时0.5s
         f_led.fill_onoff(1) #补光灯开
         time.sleep(0.5)  #延时0.5s
-
-
+    if bt == 'n':  # not succeed for uart of K210
+        f_led.fill_onoff(1) #补光灯开
+    if bt == 'h': # hands 握手成功
+        f_led.fill_onoff(0) #补光灯关
+        
     img.draw_string(32, 0, labels[_max_idx] + " %.3f"%_max_val,0xFFFF,2.0)
-
     img.draw_rectangle(32,0,256,240)
     a = img.draw_string(0, 240 - 32, "%2.1ffps" %(fps),color=(0,60,255),scale=2.0)
-
     lcd.display(img)
+
